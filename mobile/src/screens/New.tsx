@@ -5,24 +5,55 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import colors from 'tailwindcss/colors';
 
 import { BackButton } from '../components/BackButton';
 import { CheckBox } from '../components/CheckBox';
+import { api } from '../lib/api';
 
 const availableWeekDays = [
   'Domingo',
   'Segunda-feira',
   'Terça-feira',
   'Quarta-feira',
+  'Quinta-feira',
   'Sexta-feira',
   'Sábado',
 ];
 
 export function New() {
+  const [title, setTitle] = useState('');
   const [weekDays, setWeekDays] = useState<number[]>([]);
+
+  async function handleCreateANewHabit() {
+    if (!title.trim()) {
+      Alert.alert('Novo Hábito', 'Informe o nome do hábito');
+      return;
+    }
+
+    if (weekDays.length === 0) {
+      Alert.alert('Novo Hábito', 'Escolha ao menos um dia da semana');
+      return;
+    }
+
+    try {
+      await api.post('/habits', {
+        title,
+        weekDays,
+      });
+
+      setTitle('');
+      setWeekDays([]);
+
+      Alert.alert('Novo Hábito', 'Hábito criado com sucesso!');
+    } catch (error) {
+      Alert.alert('Ops', 'Não foi possível criar o novo hábito');
+      console.log(error);
+    }
+  }
 
   function handleToggleWeekDay(weekDayIndex: number) {
     if (weekDays.includes(weekDayIndex)) {
@@ -54,6 +85,8 @@ export function New() {
           className='h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 border-zinc-800 focus:border-green-600'
           placeholder='ex: Exercícios, Dormir bem, etc...'
           placeholderTextColor={colors.zinc[400]}
+          value={title}
+          onChangeText={setTitle}
         />
 
         <Text className='font-semibold mt-4 mb-3 text-white text-base'>
@@ -72,6 +105,7 @@ export function New() {
         <TouchableOpacity
           activeOpacity={0.7}
           className='w-full h-14 flex-row items-center justify-center bg-green-600 rounded-md mt-6'
+          onPress={handleCreateANewHabit}
         >
           <Feather name='check' size={20} color={colors.white} />
 
