@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import colors from 'tailwindcss/colors';
+import clsx from 'clsx';
 
 interface CheckBoxProps extends TouchableOpacityProps {
   title: string;
@@ -27,7 +28,13 @@ export function CheckBox({ title, checked = false, ...props }: CheckBoxProps) {
         <View className='h-8 w-8 bg-zinc-900 rounded-lg' />
       )}
 
-      <Text className='text-white text-base ml-3 font-semibold'>{title}</Text>
+      <Text
+        className={clsx('text-white text-base ml-3 font-semibold', {
+          'line-through': checked,
+        })}
+      >
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import { generateRangeDatesFromYearStart } from '../utils/generate-range-between-dates';
 import { api } from '../lib/api';
@@ -28,17 +28,19 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const { navigate } = useNavigation();
 
-  useEffect(() => {
-    try {
-      setLoading(true);
-      api.get('/summary').then(response => setSummary(response.data));
-    } catch (error) {
-      Alert.alert('Ops', 'Não foi possível carregar o sumário de hábitos');
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      try {
+        setLoading(true);
+        api.get('/summary').then(response => setSummary(response.data));
+      } catch (error) {
+        Alert.alert('Ops', 'Não foi possível carregar o sumário de hábitos');
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    }, [])
+  );
 
   if (loading) {
     return <Loading />;
